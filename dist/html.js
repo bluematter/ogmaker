@@ -1,9 +1,7 @@
-interface IHTML {
-  title?: string;
-}
-
-export default ({ title }: IHTML) => {
-  return `
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = ({ title }) => {
+    return `
     <html>
       <head>
         <meta charset="UTF-8" />
