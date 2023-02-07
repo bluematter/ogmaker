@@ -17,8 +17,16 @@ const puppeteer_1 = __importDefault(require("puppeteer"));
 const html_1 = __importDefault(require("./html"));
 const upload_1 = __importDefault(require("./upload"));
 const ogmaker = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "GET, POST");
+    if (req.method === "OPTIONS") {
+        res.set("Access-Control-Allow-Methods", "*");
+        res.set("Access-Control-Allow-Headers", "*");
+        res.status(204).send("");
+        return;
+    }
     try {
-        const { title } = req.body;
+        const { title, fileName } = req.body;
         const browser = yield puppeteer_1.default.launch({
             headless: true,
             args: ["--no-sandbox"],
@@ -43,6 +51,7 @@ const ogmaker = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 const screenshotBuffer = yield Buffer.from(screenshot, "base64");
                 const uploadedFile = yield (0, upload_1.default)({
                     buffer: screenshotBuffer,
+                    fileName,
                 });
                 res.status(200).send({
                     created: true,

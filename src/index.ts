@@ -4,8 +4,18 @@ import generateHTML from "./html";
 import upload from "./upload";
 
 export const ogmaker: HttpFunction = async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "GET, POST");
+
+  if (req.method === "OPTIONS") {
+    res.set("Access-Control-Allow-Methods", "*");
+    res.set("Access-Control-Allow-Headers", "*");
+    res.status(204).send("");
+    return;
+  }
+
   try {
-    const { title }: any = req.body;
+    const { title, fileName }: any = req.body;
 
     const browser = await puppeteer.launch({
       headless: true,
@@ -38,6 +48,7 @@ export const ogmaker: HttpFunction = async (req, res) => {
 
         const uploadedFile = await upload({
           buffer: screenshotBuffer,
+          fileName,
         });
 
         res.status(200).send({
