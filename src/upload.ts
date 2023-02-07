@@ -9,7 +9,7 @@ interface IUpload {
 const storage = new Storage();
 
 export default async ({ buffer, fileName }: IUpload) => {
-  const fName = fileName ? fileName : uuid() + ".jpg";
+  const fName = fileName ? fileName : uuid() + ".png";
   const bucket = storage.bucket("motionbox-og-images");
   const file = bucket.file(fName);
 

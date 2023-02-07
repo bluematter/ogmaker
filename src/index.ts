@@ -14,10 +14,11 @@ export const ogmaker: HttpFunction = async (req, res) => {
   }
 
   try {
-    const { title, fileName }: any = req.body;
+    const { title, video, fileName }: any = req.body;
 
     const { rootHandle } = await browser({
       title,
+      video,
     });
 
     const { uploadedFile } = await screenshot({

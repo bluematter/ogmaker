@@ -8,16 +8,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const storage_1 = require("@google-cloud/storage");
-const uuid_1 = require("uuid");
-const storage = new storage_1.Storage();
-exports.default = ({ buffer, fileName }) => __awaiter(void 0, void 0, void 0, function* () {
-    const fName = fileName ? fileName : (0, uuid_1.v1)() + ".png";
-    const bucket = storage.bucket("motionbox-og-images");
-    const file = bucket.file(fName);
+const puppeteer_1 = __importDefault(require("puppeteer"));
+const html_1 = __importDefault(require("./html"));
+exports.default = ({ title, video }) => __awaiter(void 0, void 0, void 0, function* () {
+    const browser = yield puppeteer_1.default.launch({
+        headless: true,
+        // args: ["--no-sandbox"],
+    });
+    const page = yield browser.newPage();
+    yield page.setContent((0, html_1.default)({
+        title,
+        video,
+    }));
+    yield page.waitForSelector(".ready");
+    // screenshot
+    const pageFrame = page.mainFrame();
+    const rootHandle = yield pageFrame.$("#root");
     return {
-        fName,
-        uploaded: yield file.save(buffer),
+        page,
+        rootHandle,
     };
 });

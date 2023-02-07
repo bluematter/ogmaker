@@ -11,8 +11,7 @@ export default async ({ fileName, rootHandle }: IScreenshot) => {
     const screenshot: string | void | Buffer = await rootHandle.screenshot({
       encoding: "base64",
       omitBackground: true,
-      type: "jpeg",
-      quality: 100,
+      type: "png",
       captureBeyondViewport: false,
     });
 
