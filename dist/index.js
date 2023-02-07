@@ -15,27 +15,51 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ogmaker = void 0;
 const puppeteer_1 = __importDefault(require("puppeteer"));
 const html_1 = __importDefault(require("./html"));
+const upload_1 = __importDefault(require("./upload"));
 const ogmaker = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { title } = req.body;
-        console.log({
-            body: req.body,
-        });
         const browser = yield puppeteer_1.default.launch({
-            headless: false,
+            headless: true,
+            args: ["--no-sandbox"],
         });
         const page = yield browser.newPage();
         yield page.setContent((0, html_1.default)({
             title,
         }));
         yield page.waitForSelector(".ready");
-        res.status(200).send({
-            works: true,
-        });
+        // screenshot
+        const pageFrame = page.mainFrame();
+        const rootHandle = yield pageFrame.$("#root");
+        if (rootHandle) {
+            const screenshot = yield rootHandle.screenshot({
+                encoding: "base64",
+                omitBackground: true,
+                type: "jpeg",
+                quality: 100,
+                captureBeyondViewport: false,
+            });
+            if (typeof screenshot === "string") {
+                const screenshotBuffer = yield Buffer.from(screenshot, "base64");
+                const uploadedFile = yield (0, upload_1.default)({
+                    buffer: screenshotBuffer,
+                });
+                res.status(200).send({
+                    created: true,
+                    uploadedFile,
+                });
+            }
+            else {
+                throw new Error("Screenshot is not a string");
+            }
+        }
+        else {
+            throw new Error("No root element found");
+        }
     }
     catch (e) {
-        console.log({
-            e,
+        res.status(500).send({
+            error: e.message,
         });
     }
 });
