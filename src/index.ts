@@ -1,6 +1,14 @@
 import { HttpFunction } from "@google-cloud/functions-framework";
-import browser from "./browser";
+import createBrowser from "./browser";
 import screenshot from "./screenshot";
+
+interface IPayload {
+  title: string;
+  video: string;
+  fileName: string;
+  linkedinUrl?: string;
+  type?: "og" | "linkedin";
+}
 
 export const ogmaker: HttpFunction = async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
@@ -14,17 +22,22 @@ export const ogmaker: HttpFunction = async (req, res) => {
   }
 
   try {
-    const { title, video, fileName }: any = req.body;
+    const { title, type, linkedinUrl, video, fileName }: IPayload = req.body;
 
-    const { rootHandle } = await browser({
+    const { page, browser, rootHandle } = await createBrowser({
+      type,
       title,
       video,
+      linkedinUrl,
     });
 
     const { uploadedFile } = await screenshot({
+      page,
       fileName,
       rootHandle,
     });
+
+    await browser.close();
 
     res.status(200).send({
       created: true,

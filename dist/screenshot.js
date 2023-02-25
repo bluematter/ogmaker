@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const upload_1 = __importDefault(require("./upload"));
-exports.default = ({ fileName, rootHandle }) => __awaiter(void 0, void 0, void 0, function* () {
+exports.default = ({ page, fileName, rootHandle }) => __awaiter(void 0, void 0, void 0, function* () {
     if (rootHandle) {
         const screenshot = yield rootHandle.screenshot({
             encoding: "base64",
@@ -36,6 +36,29 @@ exports.default = ({ fileName, rootHandle }) => __awaiter(void 0, void 0, void 0
         }
     }
     else {
-        throw new Error("No root element found");
+        if (page) {
+            const screenshot = yield page.screenshot({
+                encoding: "base64",
+                omitBackground: true,
+                type: "png",
+                captureBeyondViewport: false,
+            });
+            if (typeof screenshot === "string") {
+                const screenshotBuffer = yield Buffer.from(screenshot, "base64");
+                const uploadedFile = yield (0, upload_1.default)({
+                    buffer: screenshotBuffer,
+                    fileName,
+                });
+                return {
+                    uploadedFile,
+                };
+            }
+            else {
+                throw new Error("Screenshot is not a string");
+            }
+        }
+        else {
+            throw new Error("No root element or page found");
+        }
     }
 });

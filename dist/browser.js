@@ -14,22 +14,36 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const puppeteer_1 = __importDefault(require("puppeteer"));
 const html_1 = __importDefault(require("./html"));
-exports.default = ({ title, video }) => __awaiter(void 0, void 0, void 0, function* () {
+exports.default = ({ type, title, video, linkedinUrl }) => __awaiter(void 0, void 0, void 0, function* () {
     const browser = yield puppeteer_1.default.launch({
-        headless: true,
+        headless: false,
         // args: ["--no-sandbox"],
     });
     const page = yield browser.newPage();
-    yield page.setContent((0, html_1.default)({
-        title,
-        video,
-    }));
-    yield page.waitForSelector(".ready");
-    // screenshot
-    const pageFrame = page.mainFrame();
-    const rootHandle = yield pageFrame.$("#root");
-    return {
-        page,
-        rootHandle,
-    };
+    yield page.setViewport({
+        width: 1920,
+        height: 1080,
+    });
+    if (type === "linkedin" && linkedinUrl) {
+        yield page.goto(linkedinUrl, { waitUntil: "networkidle0" });
+        yield page.click(".contextual-sign-in-modal__modal-dismiss");
+        return {
+            page,
+            browser,
+        };
+    }
+    else {
+        yield page.setContent((0, html_1.default)({
+            title,
+            video,
+        }));
+        yield page.waitForSelector(".ready");
+        const pageFrame = page.mainFrame();
+        const rootHandle = yield pageFrame.$("#root");
+        return {
+            page,
+            browser,
+            rootHandle,
+        };
+    }
 });

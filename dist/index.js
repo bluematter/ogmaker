@@ -25,15 +25,19 @@ const ogmaker = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return;
     }
     try {
-        const { title, video, fileName } = req.body;
-        const { rootHandle } = yield (0, browser_1.default)({
+        const { title, type, linkedinUrl, video, fileName } = req.body;
+        const { page, browser, rootHandle } = yield (0, browser_1.default)({
+            type,
             title,
             video,
+            linkedinUrl,
         });
         const { uploadedFile } = yield (0, screenshot_1.default)({
+            page,
             fileName,
             rootHandle,
         });
+        yield browser.close();
         res.status(200).send({
             created: true,
             uploadedFile,
