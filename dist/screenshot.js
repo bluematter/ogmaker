@@ -17,7 +17,7 @@ exports.default = ({ page, fileName, rootHandle }) => __awaiter(void 0, void 0, 
     if (rootHandle) {
         const screenshot = yield rootHandle.screenshot({
             encoding: "base64",
-            omitBackground: true,
+            omitBackground: false,
             type: "png",
             captureBeyondViewport: false,
         });

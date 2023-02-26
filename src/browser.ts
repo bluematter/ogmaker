@@ -10,8 +10,8 @@ interface IBrowser {
 
 export default async ({ type, title, video, linkedinUrl }: IBrowser) => {
   const browser = await puppeteer.launch({
-    headless: false,
-    // args: ["--no-sandbox"],
+    headless: true,
+    args: ["--no-sandbox"],
   });
   const page = await browser.newPage();
 
@@ -22,7 +22,17 @@ export default async ({ type, title, video, linkedinUrl }: IBrowser) => {
 
   if (type === "linkedin" && linkedinUrl) {
     await page.goto(linkedinUrl, { waitUntil: "networkidle0" });
-    await page.click(".contextual-sign-in-modal__modal-dismiss");
+
+    // Add a style to the body tag
+    await page.evaluate(() => {
+      (document as any).querySelector("body").style.backgroundColor = "white";
+    });
+
+    try {
+      await page.click(".contextual-sign-in-modal__modal-dismiss");
+    } catch (e) {
+      console.log("Could not find modal");
+    }
 
     return {
       page,

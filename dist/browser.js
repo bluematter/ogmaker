@@ -16,8 +16,8 @@ const puppeteer_1 = __importDefault(require("puppeteer"));
 const html_1 = __importDefault(require("./html"));
 exports.default = ({ type, title, video, linkedinUrl }) => __awaiter(void 0, void 0, void 0, function* () {
     const browser = yield puppeteer_1.default.launch({
-        headless: false,
-        // args: ["--no-sandbox"],
+        headless: true,
+        args: ["--no-sandbox"],
     });
     const page = yield browser.newPage();
     yield page.setViewport({
@@ -26,7 +26,16 @@ exports.default = ({ type, title, video, linkedinUrl }) => __awaiter(void 0, voi
     });
     if (type === "linkedin" && linkedinUrl) {
         yield page.goto(linkedinUrl, { waitUntil: "networkidle0" });
-        yield page.click(".contextual-sign-in-modal__modal-dismiss");
+        // Add a style to the body tag
+        yield page.evaluate(() => {
+            document.querySelector("body").style.backgroundColor = "white";
+        });
+        try {
+            yield page.click(".contextual-sign-in-modal__modal-dismiss");
+        }
+        catch (e) {
+            console.log("Could not find modal");
+        }
         return {
             page,
             browser,
