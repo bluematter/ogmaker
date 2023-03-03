@@ -2,6 +2,8 @@ import { HttpFunction } from "@google-cloud/functions-framework";
 import createBrowser from "./browser";
 import screenshot from "./screenshot";
 
+const IS_DEV = process.env.NODE_ENV === "development";
+
 interface IPayload {
   title: string;
   video: string;
@@ -30,6 +32,12 @@ export const ogmaker: HttpFunction = async (req, res) => {
       video,
       linkedinUrl,
     });
+
+    if (IS_DEV) {
+      return res.status(200).send({
+        created: true,
+      });
+    }
 
     const { uploadedFile } = await screenshot({
       page,

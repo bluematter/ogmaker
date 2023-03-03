@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ogmaker = void 0;
 const browser_1 = __importDefault(require("./browser"));
 const screenshot_1 = __importDefault(require("./screenshot"));
+const IS_DEV = process.env.NODE_ENV === "development";
 const ogmaker = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.set("Access-Control-Allow-Origin", "*");
     res.set("Access-Control-Allow-Methods", "GET, POST");
@@ -32,6 +33,11 @@ const ogmaker = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             video,
             linkedinUrl,
         });
+        if (IS_DEV) {
+            return res.status(200).send({
+                created: true,
+            });
+        }
         const { uploadedFile } = yield (0, screenshot_1.default)({
             page,
             fileName,
