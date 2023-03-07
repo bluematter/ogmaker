@@ -28,7 +28,7 @@ const ogmaker = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { title, type, websiteUrl, linkedinUrl, video, fileName } = req.body;
         const { page, browser, rootHandle } = yield (0, browser_1.default)({
-            type,
+            type: type ? type : "og",
             title,
             video,
             websiteUrl,

@@ -107,13 +107,15 @@ exports.default = ({ title, video }) => {
               <script>
                 const onReady = async () => {
                   const video = document.getElementById('main-video');
-
-                  video.addEventListener('loadeddata', () => {
+                  const handleLoadedData = () => {
                     // Ready begin rendering
                     const div = document.createElement('div')
                     div.className = 'ready'
                     document.body.appendChild(div)
-                  })
+                  }
+
+                  video.addEventListener('loadeddata', handleLoadedData);
+                  setTimeout(handleLoadedData, 10000);
                 };
                 document.addEventListener("DOMContentLoaded", onReady);
               </script>

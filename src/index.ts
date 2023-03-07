@@ -29,7 +29,7 @@ export const ogmaker: HttpFunction = async (req, res) => {
       req.body;
 
     const { page, browser, rootHandle } = await createBrowser({
-      type,
+      type: type ? type : "og",
       title,
       video,
       websiteUrl,
