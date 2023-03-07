@@ -26,11 +26,12 @@ const ogmaker = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return;
     }
     try {
-        const { title, type, linkedinUrl, video, fileName } = req.body;
+        const { title, type, websiteUrl, linkedinUrl, video, fileName } = req.body;
         const { page, browser, rootHandle } = yield (0, browser_1.default)({
             type,
             title,
             video,
+            websiteUrl,
             linkedinUrl,
         });
         if (IS_DEV) {

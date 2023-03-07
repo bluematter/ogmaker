@@ -8,8 +8,9 @@ interface IPayload {
   title: string;
   video: string;
   fileName: string;
+  websiteUrl?: string;
   linkedinUrl?: string;
-  type?: "og" | "linkedin";
+  type?: "og" | "linkedin" | "website";
 }
 
 export const ogmaker: HttpFunction = async (req, res) => {
@@ -24,12 +25,14 @@ export const ogmaker: HttpFunction = async (req, res) => {
   }
 
   try {
-    const { title, type, linkedinUrl, video, fileName }: IPayload = req.body;
+    const { title, type, websiteUrl, linkedinUrl, video, fileName }: IPayload =
+      req.body;
 
     const { page, browser, rootHandle } = await createBrowser({
       type,
       title,
       video,
+      websiteUrl,
       linkedinUrl,
     });
 

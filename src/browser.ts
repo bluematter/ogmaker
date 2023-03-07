@@ -7,13 +7,20 @@ const li_token =
   "AQEDAUGiQSEA8IouAAABhqks4TYAAAGGzTllNk4AEBdGi1i6LmcprOjoRIyGbd-gtBh4JB7oM_T2ubsxooTgol6COMzP5mxFcGILYyXzyP-_zexAKf9feL3aoygmNsP6NV9nr8eyOzrW-vwwMPEorud8";
 
 interface IBrowser {
-  type?: "og" | "linkedin";
+  type?: "og" | "linkedin" | "website";
   title?: string;
   video?: string;
+  websiteUrl?: string;
   linkedinUrl?: string;
 }
 
-export default async ({ type, title, video, linkedinUrl }: IBrowser) => {
+export default async ({
+  type,
+  title,
+  video,
+  websiteUrl,
+  linkedinUrl,
+}: IBrowser) => {
   try {
     const browser = await puppeteer.launch(
       IS_DEV
@@ -142,24 +149,39 @@ export default async ({ type, title, video, linkedinUrl }: IBrowser) => {
         page,
         browser,
       };
-    } else {
-      await page.setContent(
-        generateHTML({
-          title,
-          video,
-        })
-      );
-      await page.waitForSelector(".ready");
+    }
 
-      const pageFrame = page.mainFrame();
-      const rootHandle = await pageFrame.$("#root");
+    if (type === "website" && websiteUrl) {
+      await page.goto(websiteUrl, {
+        timeout: 60000,
+        waitUntil: "networkidle0",
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      console.log("READY");
 
       return {
         page,
         browser,
-        rootHandle,
       };
     }
+
+    await page.setContent(
+      generateHTML({
+        title,
+        video,
+      })
+    );
+    await page.waitForSelector(".ready");
+
+    const pageFrame = page.mainFrame();
+    const rootHandle = await pageFrame.$("#root");
+
+    return {
+      page,
+      browser,
+      rootHandle,
+    };
   } catch (e: any) {
     console.log("Error creating browser", {
       e,

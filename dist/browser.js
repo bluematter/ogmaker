@@ -16,7 +16,7 @@ const puppeteer_1 = __importDefault(require("puppeteer"));
 const html_1 = __importDefault(require("./html"));
 const IS_DEV = process.env.NODE_ENV === "development";
 const li_token = "AQEDAUGiQSEA8IouAAABhqks4TYAAAGGzTllNk4AEBdGi1i6LmcprOjoRIyGbd-gtBh4JB7oM_T2ubsxooTgol6COMzP5mxFcGILYyXzyP-_zexAKf9feL3aoygmNsP6NV9nr8eyOzrW-vwwMPEorud8";
-exports.default = ({ type, title, video, linkedinUrl }) => __awaiter(void 0, void 0, void 0, function* () {
+exports.default = ({ type, title, video, websiteUrl, linkedinUrl, }) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const browser = yield puppeteer_1.default.launch(IS_DEV
             ? {
@@ -119,20 +119,30 @@ exports.default = ({ type, title, video, linkedinUrl }) => __awaiter(void 0, voi
                 browser,
             };
         }
-        else {
-            yield page.setContent((0, html_1.default)({
-                title,
-                video,
-            }));
-            yield page.waitForSelector(".ready");
-            const pageFrame = page.mainFrame();
-            const rootHandle = yield pageFrame.$("#root");
+        if (type === "website" && websiteUrl) {
+            yield page.goto(websiteUrl, {
+                timeout: 60000,
+                waitUntil: "networkidle0",
+            });
+            yield new Promise((resolve) => setTimeout(resolve, 5000));
+            console.log("READY");
             return {
                 page,
                 browser,
-                rootHandle,
             };
         }
+        yield page.setContent((0, html_1.default)({
+            title,
+            video,
+        }));
+        yield page.waitForSelector(".ready");
+        const pageFrame = page.mainFrame();
+        const rootHandle = yield pageFrame.$("#root");
+        return {
+            page,
+            browser,
+            rootHandle,
+        };
     }
     catch (e) {
         console.log("Error creating browser", {
